@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Объект-отображение таблицы с двигателями ТС в базе данных
+ * Vehicle engines table.
  */
 @ToString
 @Data
@@ -18,29 +18,25 @@ import java.util.List;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Engine {
     /**
-     * Аннотация обозначающая первичный ключ.
+     * Primary key annotation.
      */
     @Id
     /**
-     * Указываем что хотим, чтобы при добавлении новой записи ID генерировался автоматически.
+     * This annotation indicate that we want the ID to be generated automatically when adding a new record.
      */
     @GeneratedValue(strategy = GenerationType.AUTO)
     /**
-     * для указания соответствия между сущностью и столбцом таблицы базы данных указываем аннотацию @column и в ней имя столбца в бд
+     * To indicate the correspondence between the entity and the column of the database table, we specify the @column annotation and the name of the column in the DB in it
      */
     @Column(name = "engineID")
     Integer engineID;
-    /**
-     * Поля объекта, соответствующие полям таблицы в БД.
-     */
     @Column(name = "engine")
     String engine;
-
     @Column(name = "enginePowerBhp")
     Integer enginePowerBhp;
 
     /**
-     * указываем связь один ко многим с таблицей vehicle
+     * specifying a one-to-many relationship with the vehicle table
      */
     @OneToMany(mappedBy = "enginej", fetch = FetchType.EAGER)
     private List<Vehicle> vehicles = new ArrayList<>();

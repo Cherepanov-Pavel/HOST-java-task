@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface StatusRepository extends JpaRepository<Status, Integer> {
-    //sql запрос для поиска id статуса по его названию
+    // SQL query to search for the status id by its name
     @Query("SELECT statusID FROM Status u WHERE u.status = :status")
     Integer findByStatus(
             @Param("status") String status

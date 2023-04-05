@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface EngineRepository extends JpaRepository<Engine, Integer> {
-    //sql запрос для поиска engineID по названию двигателя и его мощности
+    // SQL query to search engine ID by engine name and power
     @Query("SELECT engineID FROM Engine u WHERE u.engine = :engine AND u.enginePowerBhp = :enginePowerBhp")
     Integer findByEngineAndEnginePowerBhp(
             @Param("engine") String engine,

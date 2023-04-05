@@ -12,20 +12,17 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 /**
- * ApplicationRunner приложения.
- * Отвечает за действия которые будут происходить при запуске сервиса.
+ * ApplicationRunner responsible for the actions that will occur when the service is launched.
  */
 @Component
 public class Loader implements ApplicationRunner {
 
-    //создаём переменную-logger для этого класса.
+    // Creating logger for this class.
     private static final Logger log = LoggerFactory.getLogger(Loader.class);
-
-    //создаём переменные для необходимых нам репозиториев.
+    // Creating variables for our repositories.
     private VehicleTypeRepository vehicleTypeRepository;
     private StatusRepository statusRepository;
-
-    //создаём конструктор класса, и указываем аннотацию @Autowired
+    // Creating constructor of class, and specify @Autowired annotation.
     @Autowired
     public Loader(VehicleTypeRepository vehicleTypeRepository, StatusRepository statusRepository) {
         this.vehicleTypeRepository = vehicleTypeRepository;
@@ -33,15 +30,13 @@ public class Loader implements ApplicationRunner {
     }
 
     /**
-     * метод класса ApplicationRunner, отвечающий за действия которые будут происходить при запуске сервиса.
-     *
-     * @param args аргументы командной строки, передаваемые при запуске приложения
+     * @param args command line arguments passed when the application is started.
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        //если у нас нет ни одного типа ТС в бд
+        // If we don't have vechicle types on DB.
         if (vehicleTypeRepository.count() == 0) {
-            //добавляем необходимые типы и сохраняем их в бд
+            // Adding necessary types, and save it in DB.
             VehicleType vehicleType = new VehicleType();
             vehicleType.setVehicleType("supercar");
             vehicleTypeRepository.save(vehicleType);
@@ -55,9 +50,9 @@ public class Loader implements ApplicationRunner {
             vehicleType.setVehicleType("helicopter");
             vehicleTypeRepository.save(vehicleType);
         }
-        //если у нас нет ни одного статуса ТС в бд
+       // If we don't have vechicle statuses on DB.
         if (statusRepository.count() == 0) {
-            //добавляем необходимые статусы и сохраняем их в бд
+            // Adding necessary statuses, and save it in DB.
             Status status = new Status();
             status.setStatus("in stock");
             statusRepository.save(status);

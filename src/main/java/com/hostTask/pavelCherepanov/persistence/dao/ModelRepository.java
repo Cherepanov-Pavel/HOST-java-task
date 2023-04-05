@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ModelRepository extends JpaRepository<Model, Integer> {
-    //sql запрос для поиска id модели по её названию
+    // SQL request to search for the model id by its name
     @Query("SELECT modelID FROM Model u WHERE u.model = :model")
     Integer findByModel(
             @Param("model") String model

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface MarqueRepository extends JpaRepository<Marque, Integer> {
-    //sql запрос для поиска marqueID по названию марки
+    // SQL query to search for a marqueID by marque name
     @Query("SELECT marqueID FROM Marque u WHERE u.marque = :marque")
     Integer findByMarque(
             @Param("marque") String marque

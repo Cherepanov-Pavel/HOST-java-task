@@ -11,48 +11,50 @@ import javax.transaction.Transactional;
 import java.util.Map;
 
 /**
- * Класс для выполнения задач по расписанию
+ * Class for running scheduled tasks.
  */
 @Service
 public class SchedulerService {
     /**
-     * Создаём логгер этого класса и бин репозитория таблицы Vehicle
+     * Creating logger for this class and bean of Vehicle table.
      */
     private static final Logger log = LoggerFactory.getLogger(SchedulerService.class);
     private final VehicleRepository vehicleRepository;
 
     /**
-     * Конструктор класса, для заполнения бинов
+     * Class constructor, for fill a bean.
      */
     public SchedulerService(
             VehicleRepository vehicleRepository) {
         this.vehicleRepository = vehicleRepository;
-        //логируем информацию, о том что сервис был создан
+        // Here we log the information that the service was created.
         log.info("SchedulerService was created!");
     }
 
-    //аннотацией sheduled указываем что этот метод будет выполняться по расписанию
-    //Параметр initialDelayString задаёт время в миллисекундах, которое пройдёт перед первым запуском данной задачи
-    //Параметр fixedDelayString задаёт время в миллисекундах между запусками данной задачи.
-    //${scheduler.delay} - означает что это время указано в application.properties
+    /**
+     * The Scheduled annotation indicates that this method will be executed on a schedule.
+     * The initialDelayString parameter specifies the time in ms that will elapse before the first start of this task.
+     * The fixedDelayString parameter specifies the time in ms between runs of this task.
+     * ${scheduler.delay} - means that this time is specified in application.properties
+     */
     @Scheduled(initialDelayString = "${scheduler.delay}", fixedDelayString = "${scheduler.delay}")
-    //указал аннотацию для устанения ошибки, из-за которой отсутсвовал доступ к репозиторию из этого метода
+    // Here I have provided an annotation to fix the error that caused access to the repository from this method to be missing.
     @Transactional
     /**
-     * Метод выполняющийся по расписанию
+     * A method that runs on a schedule.
      */
     public void doWork() throws InterruptedException {
-        //логируем информацию что процесс запущен
+        // Logging information that process was started.
         log.info("Start process");
-        //получаем случайное GUID случайного ТС из БД
+        // Getting random GUID of random vehicle from DB.
         Map<String, Object> result = vehicleRepository.queryRandomTSSheduler();
-        //с помощью метода getOne находим запись с этими guid в базе данных
+        // With getOne method getting record with this GUID from DB.
         Vehicle vehicle = vehicleRepository.getOne(result.get("guid").toString());
-        //устанавливаем этой записи price в 0
+        // Setting price this record to zero.
         vehicle.setPrice(0);
-        //сохраняем запись
+        // Saving record to DB.
         vehicleRepository.save(vehicle);
-        //логируем информацию что процесс завершён
+        // Logging information that process was ended.
         log.info("End process");
     }
 }

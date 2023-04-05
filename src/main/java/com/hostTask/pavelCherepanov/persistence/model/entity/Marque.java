@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Объект-отображение таблицы с марками ТС в базе данных.
+ * Vehicle marques table.
  */
 @ToString
 @Data
@@ -19,26 +19,23 @@ import java.util.List;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Marque {
     /**
-     * Аннотация обозначающая первичный ключ.
+     * Primary key annotation.
      */
     @Id
     /**
-     * Указываем что хотим, чтобы при добавлении новой записи ID генерировался автоматически.
+     * This annotation indicate that we want the ID to be generated automatically when adding a new record.
      */
     @GeneratedValue(strategy = GenerationType.AUTO)
     /**
-     * для указания соответствия между сущностью и столбцом таблицы базы данных указываем аннотацию @column и в ней имя столбца в бд
+     * To indicate the correspondence between the entity and the column of the database table, we specify the @column annotation and the name of the column in the DB in it
      */
     @Column(name = "marqueID")
     Integer marqueID;
-    /**
-     * Поля объекта, соответствующие полям таблицы в БД.
-     */
     @Column(name = "marque")
     String marque;
 
     /**
-     * указываем связь один ко многим с таблицей marqueModel
+     * specifying a one-to-many relationship with the marqueModel table
      */
     @OneToMany(mappedBy = "marquej", fetch = FetchType.EAGER)
     private List<MarqueModel> marqueModels = new ArrayList<>();

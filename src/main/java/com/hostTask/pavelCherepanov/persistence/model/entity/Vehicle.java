@@ -9,7 +9,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 /**
- * Объект-отображение таблицы с транспортными средствами в базе данных.
+ * Vehicles table.
  */
 @ToString
 @Data
@@ -18,40 +18,37 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Vehicle {
 	/**
-	 * Аннотация обозначающая первичный ключ.
+	 * Primary key annotation.
 	 */
 	@Id
 	/**
-	 * для указания соответствия между сущностью и столбцом таблицы базы данных указываем аннотацию @column и в ней имя столбца в бд
+	 * To indicate the correspondence between the entity and the column of the database table, we specify the @column annotation and the name of the column in the DB in it.
 	 */
 	@Column(name = "guid")
 	String guid;
 	/**
-	 * Поля объекта, соответствующие полям таблицы в БД.
-	 */
-	/**
-	 * указываем связь многие к одному с таблицей VehicleType
+	 * specifying a many-to-one relationship with the VehicleType table
 	 */
 	@ManyToOne(optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "vehicleTypeID")
 	VehicleType vehicletypej;
 
 	/**
-	 * указываем связь многие к одному с таблицей Engine
+	 * specifying a many-to-one relationship with the Engine table
 	 */
 	@ManyToOne(optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "engineID")
 	Engine enginej;
 
 	/**
-	 * указываем связь многие к одному с таблицей Status
+	 * specifying a many-to-one relationship with the Status table
 	 */
 	@ManyToOne(optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "statusID")
 	Status statusj;
 
 	/**
-	 * указываем связь многие к одному с таблицей MarqueModel
+	 * specifying a many-to-one relationship with the MarqueModel table
 	 */
 	@ManyToOne(optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "marqueModelID")

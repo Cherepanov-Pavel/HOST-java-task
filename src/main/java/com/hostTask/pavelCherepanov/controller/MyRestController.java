@@ -19,23 +19,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * Класс-контроллер приложения.
- * Отвечает за обработку запросов по адресу service-address:port/vehicle
+ * class-controlles of application.
+ * Processes requests at service-address:port/vehicle
  */
 @RestController
 @RequestMapping("/vehicle")
 public class MyRestController {
 
     /**
-     * Логгер. Необходим для правильного вывода сообщений из кода.
+     * Logger needs for properly showing messages from code.
      */
     public static final Logger logger = LoggerFactory.getLogger(MyRestController.class);
     /**
-     * DateTimeFormatter, необоходим для преобразования даты и времени, согласно указанному паттерну
+     * DateTimeFormatter is required to convert date and time, according to the specified pattern.
      */
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     /**
-     * переменные с необходимыми нам бинами
+     * variables with beans needs for us
      */
     private final AddVehicleRequestBodyToVehicleMapper vehicleRequestBodyToVehicleMapper;
     private final VehicleRepository vehicleRepository;
@@ -47,15 +47,15 @@ public class MyRestController {
     private final EntityManager entityManager;
 
     /**
-     * Конструктор. Вызывается spring контекстом, когда контроллер создаётся.
-     * Аннотация @Autowired необходима для того, чтобы spring контекст вставил сюда
-     * подходящий по типу класс-bean. bean(бины) могут быть разных типов.
-     * Их объединяет то, что все они находятся в контексте, как фасолины в банке.
-     * spring сам решает, какой и когда вызывать в той или иной ситуации.
-     * Класс, помеченный аннотацией @RestController также является бином и
-     * находится в контексте приложения.
-     * Но так как если в классе один конструктор, то он по умолчанию является @autowired,
-     * поэтому явно указывать эту аннотацию здесь не нужно.
+     * Constructor. Called by the spring context when the controller is created.
+     * @Autowired annotaton  is needed in order to spring context put here
+     * suitable by type bean-class. Beans can be different types.
+     * They are united by the fact that they are all in context, like beans in a jar.
+     * spring itself decides which and when to call in a given situation.
+     * The class marked with the @RestController annotation is also a bin and
+     * is in the context of the application.
+     * But since if there is one constructor in the class, then it is by default @autowired,
+     * therefore, it is not necessary to explicitly specify this annotation here.
      */
     public MyRestController(AddVehicleRequestBodyToVehicleMapper vehicleRequestBodyToVehicleMapper,
                             AddAndPutVehicleToVehicleResponseBodyMapper vehicleToVehicleResponseBodyMapper,
@@ -73,37 +73,37 @@ public class MyRestController {
         this.vehicleToPutVehicleMapper = vehicleToPutVehicleMapper;
         this.vehicleToSearchGuidResponseMapper = vehicleToSearchGuidResponseMapper;
         this.vehicleRepository = vehicleRepository;
-        //сообщаем о успешном создании контроллера
+        // Here we log the information that the controller was sucefully created.
         logger.info("MyRestController was created!");
     }
 
     /**
-     * Метод, отвечающий за обработку post запросов по адресу
-     * service-address:port/vehicle Метод принимает объект типа AddVehicleRequestBody
-     * в теле запроса замаршаленный в json объект
+     * The method responsible for processing post requests at
+     * service-address:port/vehicle 
+     * Method getting object of AddVehicleRequestBody type
      *
-     * @param vehicleRequest принимаемый объект. spring демаршалит его за нас.
-     * @param request        параметры запроса.
-     * @return созданное и заполненное данными тело ответа, с информацией о добавленной записи
+     * @param vehicleRequest getting object. spring will do demarshalling for us.
+     * @param request        request parameters.
+     * @return the response body created and filled with data, with information about the added record.
      */
     @PostMapping(produces = "application/json", consumes = "application/json")
     public ResponseEntity<AddAndPutVehicleResponseBody> postVehicle(
             @RequestBody AddVehicleRequestBody vehicleRequest,
             HttpServletRequest request) {
-        //создаём объект типа Vehicle, и, с помощью созданного нами маппера, заполняем его данными из тела запроса.
+        // Creating object of Vehicle type, and, with help of our mapper, fill it data from request body.
         Vehicle vehicle = vehicleRequestBodyToVehicleMapper.map(vehicleRequest);
-        //добавляем в наш Vehicle данные, которых нет в теле запроса.
+        // Putting in our Vehicle data, which we don't have in request body.
         vehicle.setGuid(UUID.randomUUID().toString());
         LocalDateTime date = LocalDateTime.now();
         String formattedDateTime = date.format(formatter);
         date = LocalDateTime.parse(formattedDateTime, formatter);
         vehicle.setDateInsert(date);
         vehicle.setDatePurchase(date);
-        //сохраняем нашу запись через репозиторий в бд.
+        // Saving our record to DB via the repository.
         vehicleRepository.save(vehicle);
-        //логируем информацию что была создана новая запись и указываем guid новой записи
+        // Here we log the information that new record was successfully created.
         logger.info("Vehicle with guid={} was created!", vehicle.getGuid());
-        //возвращаем в теле ответа специально созданный нами responsebody, c информацией о новой записи, который мы заполняем данными с помощью маппера
+        // We return a specially created responsebody, with information about the new record, which we fill with data using a mapper.
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,32 +111,33 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку put запросов по адресу
-     * service-address:port/vehicle Метод принимает объект типа AddVehicleRequestBody.
+     * The method responsible for processing put requests at
+     * service-address:port/vehicle
+     * Method getting object of AddVehicleRequestBody type
      *
-     * @param vehiclePut принимаемый объект. spring демаршалит его за нас.
-     * @param request    параметры запроса.
-     * @return созданное и заполненное данными тело ответа, с информацией о обновлённой записи
+     * @param vehiclePut getting object. spring will do demarshalling for us.
+     * @param request    request parameters.
+     * @return the response body created and filled with data, with information about the updated record.
      */
 
     @PutMapping(produces = "application/json", consumes = "application/json")
     public ResponseEntity<AddAndPutVehicleResponseBody> putVehicle(
             @RequestBody PutVehicleRequestBody vehiclePut,
             HttpServletRequest request) {
-        //по Guid находим в БД нужную нам запись
+        // Finding in DB record by GUID 
         Vehicle vehicle = vehicleRepository.getOne(vehiclePut.getGuid());
-        //с помощью созданного нами маппера изменяем данные в найденной записи
+        // With help of our mapper, we changing data on record
         vehicleToPutVehicleMapper.mapFromInputInOutput(vehiclePut, vehicle);
-        //обновлеяем DatePurchase
+        // Updating DatePurchase.
         LocalDateTime date = LocalDateTime.now();
         String formattedDateTime = date.format(formatter);
         date = LocalDateTime.parse(formattedDateTime, formatter);
         vehicle.setDatePurchase(date);
-        //с помощью метода репозитория обновляем запись в базе данных
+        // Using the repository method, we update the record in the database.
         vehicle = vehicleRepository.save(vehicle);
-        //логируем информацию что запись была обновлена и указываем guid обновлённой записи
+        // Here we log the information that record was successfully updated.
         logger.info("Vehicle with guid={} was purchase!", vehicle.getGuid());
-        //возвращаем в теле ответа специально созданный нами responsebody, c информацией о обновлённой записи, который мы заполняем данными с помощью маппера
+        // We return a specially created responsebody, with information about the updated record, which we fill with data using a mapper.
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -144,14 +145,14 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку get запросов по адресу
+     * The method responsible for processing get requests at
      * service-address:port/vehicle/search?{vehicleType}&{marque}&{model}&{engine}&{status}
-     * Метод принимает параметры поиска
-     * и возвращает ТС из базы данных в виде json объекта.
+     * The method accepts search parameters
+     * and returning a vehicle from DB like JSON object.
      *
-     * @param vehicleType,marque,model,engine,status - даннные, по которым будем искать ТС(status является необязательным)
-     * @param request                                параметры запроса.
-     * @return созданное и заполненное данными тело ответа, с найденными записями
+     * @param vehicleType,marque,model,engine,status data that we will use to search for a vehicle (status is optional)
+     * @param request                                request parameters.
+     * @return the response body created and filled with data, with finded by params records.
      */
 
     @GetMapping("/search")
@@ -162,7 +163,7 @@ public class MyRestController {
             @RequestParam("engine") String engine,
             @RequestParam(value = "status", required = false) String status,
             HttpServletRequest request) {
-        //создаём sql запрос для поиска в базе данных записей, которые соответсвуют указанным параметрам
+        // Creating an sql query to search the database for records that match the provided parameters
         String sql = "SELECT vehicle.guid, vehicle_type.vehicle_type, marque.marque, model.model, " +
                 "engine.engine, engine.engine_power_bhp, vehicle.top_speed_mph, vehicle.cost_usd, vehicle.price, " +
                 "vehicle.date_insert, status.status  FROM vehicle " +
@@ -176,12 +177,12 @@ public class MyRestController {
                 "AND marque.marque = '" + marque + "' " +
                 "AND model.model = '" + model + "' " +
                 "AND engine.engine = '" + engine + "' ";
-        //т.к. параметр status является необязательным, проверяем его наличие, и если он присутствует
+        // Since the status parameter is optional, we check its presence, and if it is present...
         if (status != null) {
-            //то подключаем его к поиску
+            //...then we connect it to the search
             sql += "AND status.status = '" + status + "'";
         }
-        //выполняем запрос к базе данных, и получаем все записи, которые соответсвуют введённым параментрам и возращаем их список с помощью метода getResultList
+        // We execute a query to the database, and we get all the records that correspond to the provided parameters and return their list using the method getResultList
         List<GetVehicleByParamResponseBody> getVehicleByParamResponseBodies = entityManager.createNativeQuery(sql).getResultList();
         return ResponseEntity
                 .ok()
@@ -190,19 +191,20 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку get запросов по адресу
-     * service-address:port/vehicle/{guid} Метод принимает guid ТС
-     * и возвращает ТС из базы данных в виде json объекта.
+     * The method responsible for processing get requests at
+     * service-address:port/vehicle/{guid} 
+     * The method accepts GUID of vehicle,
+     * and returning a vehicle from DB like JSON object.
      *
-     * @param guid    - первичный ключ в бд объекта, по которому будем искать ТС.
-     * @param request параметры запроса.
-     * @return созданное и заполненное данными тело ответа, с найденной записью
+     * @param guid    the primary key in the database of the object by which we will search for the vehicle.
+     * @param request request params.
+     * @return the response body created and filled with data, with finded by GUID record.
      */
     @GetMapping("/{guid}")
     public ResponseEntity<SearchResponseBody> getVehicleByGuid(
             @PathVariable String guid,
             HttpServletRequest request) {
-//ищем запись по guid и передаём её в маппер, который создаёт responsebody
+        // We are finding for a record by GUID and putting it to the mapper, which creates responsebody
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -210,19 +212,19 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку get запросов по адресу
-     * http://localhost:8080/vehicle/types Метод
-     * подсчитывает и возвращает типы ТС, которые есть в сущности Vehicle
+     * The method responsible for processing get requests at
+     * http://localhost:8080/vehicle/types 
+     * The method calculating and returning types of Vehicle entity.
      *
-     * @param request параметры запроса.
-     * @return созданное и заполненное данными тело ответа, с найденными записями
+     * @param request request params.
+     * @return the response body created and filled with data, with finded records.
      */
     @GetMapping("/types")
     public ResponseEntity<ArrayList<GetTSPopularParamResponseBody>> getTSByType(
             HttpServletRequest request) {
-        //с помощью sql запроса в репозитории получаем все типы ТС, которые есть в сущности Vehicle
+        // Using an sql query in the repository, we get all the types of vehicles that are in the Vehicle entity.
         ArrayList<String> countVehicleType = vehicleRepository.queryTypesTS();
-        //подсчитываем количество найденных типов, мапим полученный ArrayList в Responsebody и возвращаем его
+        // Doing mapping and returning result.
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -230,20 +232,20 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку get запросов по адресу
-     * http://localhost:8080/vehicle/marque. Метод
-     * подсчитывает и возвращает марки ТС, которые есть в сущности Vehicle
+     * The method responsible for processing get requests at
+     * http://localhost:8080/vehicle/marque. 
+     * The method calculating and returning marques of Vehicle entity.
      *
-     * @param request параметры запроса.
-     * @return созданное и заполненное данными тело ответа, с найденными записями
+     * @param request request params.
+     * @return the response body created and filled with data, with finded records.
      */
 
     @GetMapping("/marque")
     public ResponseEntity<ArrayList<GetTSPopularParamResponseBody>> getTSByMarque(
             HttpServletRequest request) {
-        //с помощью sql запроса в репозитории получаем все марки ТС, которые есть в сущности Vehicle
+        // Using an sql query in the repository, we get all the marques of vehicles that are in the Vehicle entity.
         ArrayList<String> countVehicleType = vehicleRepository.queryMarqueTS();
-        //подсчитываем количество найденных марок, мапим полученный ArrayList в Responsebody и возвращаем его
+        // Doing mapping and returning result.
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -251,19 +253,19 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку get запросов по адресу
-     * http://localhost:8080/vehicle/status. Метод
-     * подсчитывает и возвращает статусы у ТС, которые есть в сущности Vehicle
+     * The method responsible for processing get requests at
+     * http://localhost:8080/vehicle/status. 
+     * The method calculating and returning statuses of Vehicle entity.
      *
-     * @param request параметры запроса.
-     * @return созданное и заполненное данными тело ответа, с найденными записями
+     * @param request request params.
+     * @return the response body created and filled with data, with finded records.
      */
     @GetMapping("/status")
     public ResponseEntity<ArrayList<GetTSPopularParamResponseBody>> getTSByStatus(
             HttpServletRequest request) {
-        //с помощью sql запроса в репозитории получаем все статусы ТС, которые есть в сущности Vehicle
+        // Using an sql query in the repository, we get all the statuses of vehicles that are in the Vehicle entity.
         ArrayList<String> countVehicleType = vehicleRepository.queryStatusTS();
-        //подсчитываем количество найденных статусов, мапим полученный ArrayList в Responsebody и возвращаем его
+        // Doing mapping and returning result.
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -271,30 +273,30 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку get запросов по адресу
-     * http://localhost:8080/vehicle/populartype. Метод
-     * подсчитывает и возвращает самые популярные марки, типы и статусы транспортных средств
+     * The method responsible for processing get requests at
+     * http://localhost:8080/vehicle/populartype. 
+     * The method calculating and returning the most popular marques, types and statuses of vehicles
      *
-     * @param request параметры запроса.
-     * @return созданное и заполненное данными тело ответа, в котором находятся названия и количество
-     * самых популярных марок, типок и статусов транспортных средств
+     * @param request request params.
+     * @return the response body created and filled with data,
+     * which contains the names and number of the most popular marques, types and statuses of vehicles
      */
     @GetMapping("/populartype")
     public ResponseEntity<GetTSMostPopularParamResponseBody> getTSByMostPopular(
             HttpServletRequest request) {
-        //создаём тело ответа
+        // Creating response body
         GetTSMostPopularParamResponseBody tsMostPopularParamResponseBody = new GetTSMostPopularParamResponseBody();
-        //с помощью sql запроса получаем все типы ТС
+        // Using the sql query in the repository, we getting all vehicles types
         ArrayList<String> countVehicleType = vehicleRepository.queryTypesTS();
-        //в маппере находим самый популярный тип, и помещаем его в tsMostPopularParamResponseBody
+        // With mapper we find the most popular type, and put it to tsMostPopularParamResponseBody
         tsMostPopularParamResponseBody.setType(arrayListParamTSToStringMapper.map(countVehicleType));
-        //с помощью sql запроса получаем все марки ТС
+        // Using the sql query in the repository, we getting all vehicles marques
         countVehicleType = vehicleRepository.queryMarqueTS();
-        //в маппере находим самый популярный тип, и помещаем его в tsMostPopularParamResponseBody
+        // With mapper we find the most popular marque, and put it to tsMostPopularParamResponseBody
         tsMostPopularParamResponseBody.setMarque(arrayListParamTSToStringMapper.map(countVehicleType));
-        //с помощью sql запроса получаем все типы ТС
+        // Using the sql query in the repository, we getting all vehicles statuses
         countVehicleType = vehicleRepository.queryStatusTS();
-        //в маппере находим самую популярную марку, и помещаем её в tsMostPopularParamResponseBody
+        // With mapper we find the most popular status, and put it to tsMostPopularParamResponseBody
         tsMostPopularParamResponseBody.setStatus(arrayListParamTSToStringMapper.map(countVehicleType));
         return ResponseEntity
                 .ok()
@@ -303,36 +305,36 @@ public class MyRestController {
     }
 
     /**
-     * Метод, отвечающий за обработку get запросов по адресу
-     * http://localhost:8080/vehicle/random. Метод
-     * выбираtn случайную запись ТС из БД и заменяет в ответе значения всех строковых параметров на строки с символами в обратном порядке
+     * The method responsible for processing get requests at
+     * http://localhost:8080/vehicle/random. 
+     * The method get random vehicle record from DB and replaces the values of all string parameters in the response with strings with characters in reverse order.
      *
-     * @param request параметры запроса.
-     * @return созданное и заполненное данными тело ответа, в котором находится случайная запись,
-     * с изменёнными строками
+     * @param request request params.
+     * @return the response body created and filled with random record, with changed strings.
      */
     @GetMapping("/random")
     public ResponseEntity<Map<String, Object>> getRandom(
             HttpServletRequest request) {
-        //с помощью sql запроса получаем поля случайной записи
+        // Using the sql query in the repository, we getting random vehicle
         Map<String, Object> resultSql = vehicleRepository.queryRandomTS();
-        //создаём новый hashmap для изменённой записи
+        // Creating new hashmap for changed entity
         Map<String, Object> resultChange = new HashMap<>();
-        //цикл последовательно перебирающий все значения из resultSql
+        // Iterating all values from resultSql
         for (Map.Entry<String, Object> entry : resultSql.entrySet()) {
-            //если найдена строка
+            //if we find the String type
             if (entry.getValue().getClass().getName() == "java.lang.String") {
-                //выставляем символы в ней в обратном порядке
+                //we putting the symbols in it in reverse order
                 String reversedString = new StringBuilder(entry.getValue().toString()).reverse().toString();
-                //помещаем в resultChange
+                //pupping to resultChange
                 resultChange.put(entry.getKey(), reversedString);
-                //если же строки не найдено
+
+                //if we don't find the String type
             } else {
-                //то просто помещаем в resultChange
+                //just putting it to resultChange
                 resultChange.put(entry.getKey(), entry.getValue());
             }
         }
-        //возвращаем получивщийся HashMap
+        //returning HashMap
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
